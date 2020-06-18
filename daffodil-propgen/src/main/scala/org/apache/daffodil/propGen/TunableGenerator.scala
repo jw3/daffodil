@@ -17,7 +17,6 @@
 
 package org.apache.daffodil.propGen
 
-import scala.xml.XML
 
 class TunableGenerator(schemaRootConfig: scala.xml.Node, schemaRootExt: scala.xml.Node) {
 
