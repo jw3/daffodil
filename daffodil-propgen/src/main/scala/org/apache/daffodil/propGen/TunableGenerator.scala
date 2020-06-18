@@ -55,7 +55,6 @@ class TunableGenerator(schemaRootConfig: scala.xml.Node, schemaRootExt: scala.xm
     |import org.apache.daffodil.exceptions.ThrowsSDE
     |import org.apache.daffodil.schema.annotation.props.EmptyElementParsePolicy
     |import org.apache.daffodil.schema.annotation.props.Enum
-    |import org.apache.daffodil.util.LogLevel
     |import org.apache.daffodil.util.Logging
     |import org.apache.daffodil.util.Misc
     |import org.apache.daffodil.xml.DaffodilXMLLoader
