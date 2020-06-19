@@ -70,9 +70,7 @@ class ReverseWords extends UserDefinedFunction {
    * @param sep Boundary to split your sentence on
    * @return reversed sentence based on $sep boundary
    */
-  def evaluate(strToRev: String, sep: String = " ") = {
+  def evaluate(strToRev: String, sep: String = " "): String = {
     throw new UserDefinedFunctionProcessingError("UDF PE!")
-    val ret = strToRev.split(sep).reverse.mkString(sep)
-    ret
   }
 }
