@@ -113,8 +113,9 @@ lazy val commonSettings = Seq(
     "-unchecked",
     "-Xfatal-warnings",
     "-Xxml:-coalescing",
-    "-Xfuture"
-  ),
+    "-Xfuture",
+    "-Ywarn-unused:imports",
+),
   // Workaround issue that some options are valid for javac, not javadoc.
   // These javacOptions are for code compilation only. (Issue sbt/sbt#355)
   javacOptions in Compile in compile ++= Seq(
