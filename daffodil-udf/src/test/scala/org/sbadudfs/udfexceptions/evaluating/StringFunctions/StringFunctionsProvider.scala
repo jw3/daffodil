@@ -51,10 +51,9 @@ class Reverse extends UserDefinedFunction {
    * @param str string whose order you wish to reverse
    * @return reversed str
    */
-  def evaluate(str: String) = {
+  def evaluate(str: String): String = {
     val ret = str.reverse
     throw new CustomException("UDF Error!")
-    ret
   }
 }
 

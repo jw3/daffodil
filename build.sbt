@@ -114,6 +114,7 @@ lazy val commonSettings = Seq(
     "-Xfatal-warnings",
     "-Xxml:-coalescing",
     "-Xfuture",
+    "-Ywarn-dead-code",
     "-Ywarn-unused:imports",
 ),
   // Workaround issue that some options are valid for javac, not javadoc.
