@@ -180,7 +180,7 @@ abstract class ChoiceTermBase(
    * actually need to know the optRepValueSet of an entire choiceGroup, we can simple avoid thinking about it until such a time that we do.
    */
 
-  override final lazy val optRepValueSet = Assert.invariantFailed("We shouldn't need to compute the optRepValueSet of a choiceGroup")
+  override final def optRepValueSet = Assert.invariantFailed("We shouldn't need to compute the optRepValueSet of a choiceGroup")
 
   final override lazy val hasKnownRequiredSyntax = LV('hasKnownRequiredSyntax) {
     if (hasFraming) true

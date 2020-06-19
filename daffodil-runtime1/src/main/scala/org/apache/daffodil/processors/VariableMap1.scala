@@ -217,7 +217,7 @@ class VariableMap private(vTable: Map[GlobalQName, MStackOf[VariableInstance]])
     if (optVariable.isDefined) Some(optVariable.get.rd) else None
   }
 
-  lazy val context = Assert.invariantFailed("unused.")
+  def context = Assert.invariantFailed("unused.")
 
   /**
    * For testing mostly.

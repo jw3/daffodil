@@ -204,5 +204,5 @@ class SpecifiedLengthPrefixedCharacters(e: ElementBase, eGram: => Gram)
     e.prefixedLengthElementDecl.elementRuntimeData,
     e.prefixedLengthAdjustmentInUnits)
 
-  lazy val unparser: Unparser = Assert.nyi("unparsing with dfdl:lengthKind=\"prefixed\" and dfdl:lengthUnits=\"characters\"")
+  def unparser: Unparser = Assert.nyi("unparsing with dfdl:lengthKind=\"prefixed\" and dfdl:lengthUnits=\"characters\"")
 }

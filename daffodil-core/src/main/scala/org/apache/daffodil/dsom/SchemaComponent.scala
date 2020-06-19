@@ -286,7 +286,7 @@ final class Schema(val namespace: NS, schemaDocs: Seq[SchemaDocument], schemaSet
 
   override def targetNamespace: NS = namespace
 
-  override lazy val schemaDocument: SchemaDocument = Assert.usageError("schemaDocument should not be called on Schema")
+  override def schemaDocument: SchemaDocument = Assert.usageError("schemaDocument should not be called on Schema")
 
   override lazy val schemaSet = schemaSetArg
 

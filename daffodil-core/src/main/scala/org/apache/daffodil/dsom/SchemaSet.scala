@@ -102,8 +102,8 @@ final class SchemaSet(
 
   override lazy val schemaSet = this
 
-  override lazy val schemaDocument = Assert.usageError("schemaDocument should not be called on SchemaSet")
-  override lazy val xmlSchemaDocument = Assert.usageError("xmlSchemaDocument should not be called on SchemaSet")
+  override def schemaDocument = Assert.usageError("schemaDocument should not be called on SchemaSet")
+  override def xmlSchemaDocument = Assert.usageError("xmlSchemaDocument should not be called on SchemaSet")
 
   override lazy val lineAttribute: Option[String] = None
 

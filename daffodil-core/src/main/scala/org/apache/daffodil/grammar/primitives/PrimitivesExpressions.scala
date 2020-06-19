@@ -246,7 +246,7 @@ case class InputValueCalc(
     new IVCParser(expr, e.elementRuntimeData)
   }
 
-  override lazy val unparser = Assert.usageError("Not to be called on InputValueCalc class.")
+  override def unparser = Assert.usageError("Not to be called on InputValueCalc class.")
 }
 
 case class TypeValueCalc(e: ElementBase)

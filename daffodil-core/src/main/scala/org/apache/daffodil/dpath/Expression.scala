@@ -2025,7 +2025,7 @@ case class FNExactlyOneExpr(nameAsParsed: String, fnQName: RefQName, args: List[
 
   override lazy val inherentType: NodeInfo.Kind = NodeInfo.AnyType
 
-  override lazy val compiledDPath = {
+  override def compiledDPath = {
     checkArgCount(1)
     subsetError("fn:exactly-one is not supported.")
   }

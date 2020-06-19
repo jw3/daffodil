@@ -87,7 +87,7 @@ trait Facets { self: Restriction =>
     // so we must escape characters that can be interpreted as RegEx
     enumerations.map(s => escapeForRegex(s)).mkString("|")
   }
-  final lazy val localWhitespaceValue: String = {
+  final def localWhitespaceValue: String = {
     whitespace(xml)
     SDE("whitespaceValue is not implemented for DFDL v1.0 schemas but reserved for future use.")
   }
