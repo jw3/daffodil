@@ -57,21 +57,10 @@ class Reverse extends UserDefinedFunction {
  */
 @UserDefinedFunctionIdentification(name = "rev-words",
   namespaceURI = "http://example.com/scala/udf")
-class ReverseWords extends UserDefinedFunction {
+class ReverseWords extends UserDefinedFunction() {
   case class CustomException(
     private val message: String = "",
     private val cause: Throwable = None.orNull)
     extends Exception(message, cause)
-  throw new CustomException("UDF Error!")
-  /**
-   * Reverses the order of words in a sentence
-   *
-   * @param strToRev string whose word order you wish to reverse
-   * @param sep Boundary to split your sentence on
-   * @return reversed sentence based on $sep boundary
-   */
-  def evaluate(strToRev: String, sep: String = " ") = {
-    val ret = strToRev.split(sep).reverse.mkString(sep)
-    ret
-  }
+  throw CustomException("UDF Error!")
 }

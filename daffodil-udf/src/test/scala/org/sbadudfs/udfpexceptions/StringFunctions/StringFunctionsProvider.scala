@@ -33,7 +33,6 @@ class StringFunctionsProvider extends UserDefinedFunctionProvider {
 
   override def getUserDefinedFunctionClasses = {
     throw new CustomException("UDFP Error!")
-    Array(classOf[ReverseWords], classOf[Reverse])
   }
 }
 

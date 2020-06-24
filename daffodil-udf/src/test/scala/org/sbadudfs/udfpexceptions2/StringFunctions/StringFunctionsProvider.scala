@@ -31,10 +31,10 @@ class StringFunctionsProvider extends UserDefinedFunctionProvider {
     private val cause: Throwable = None.orNull)
     extends Exception(message, cause)
 
-  throw new CustomException("UDFP Error!")
   override def getUserDefinedFunctionClasses = {
     Array(classOf[ReverseWords], classOf[Reverse])
   }
+  throw CustomException("UDFP Error!")
 }
 
 /**

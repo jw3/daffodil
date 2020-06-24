@@ -33,8 +33,8 @@ class MyClass extends Logging {
     "about nothing at all."
   }
 
-  lazy val bombArg: String = Assert.abort("bombArg should not be evaluated")
-  lazy val bombMsg: String = Assert.abort("bombMsg should not be evaluated")
+  def bombArg: String = Assert.abort("bombArg should not be evaluated")
+  def bombMsg: String = Assert.abort("bombMsg should not be evaluated")
 
   def logSomething(): Unit = {
 
