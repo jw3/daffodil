@@ -19,6 +19,8 @@ package org.apache.daffodil.util
 
 import java.net.URI
 
+import org.apache.daffodil.api.Validator
+
 import scala.collection.mutable
 import scala.xml.parsing.NoBindingFactoryAdapter
 
@@ -32,7 +34,7 @@ import org.xml.sax.ErrorHandler
  * to do a validation pass on the TDML expected Infoset w.r.t. the model and to
  * do a validation pass on the actual result w.r.t. the model as an XML document.
  */
-object Validator extends NoBindingFactoryAdapter {
+object DefaultValidator extends NoBindingFactoryAdapter {
 
   private type CacheType = mutable.HashMap[Seq[String], javax.xml.validation.Validator]
 
@@ -100,3 +102,12 @@ object Validator extends NoBindingFactoryAdapter {
   }
 }
 
+// an spi-able proxy for the the default validator object
+class DefaultValidatorSPIProvider extends Validator {
+  override def name(): String = "default"
+
+  def validateXML(document: java.io.InputStream, errHandler: ErrorHandler, args: Seq[Validator.Argument]): Unit = {
+    val schemaFileNames = args.flatMap(_.value.split(","))
+    DefaultValidator.validateXMLSources(schemaFileNames, document, errHandler)
+  }
+}

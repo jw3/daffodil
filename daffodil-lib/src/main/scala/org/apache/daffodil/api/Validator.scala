@@ -17,15 +17,28 @@
 
 package org.apache.daffodil.api
 
-import org.apache.daffodil.api.Validator.Argument
-import org.apache.daffodil.util.Enum
+import org.xml.sax.ErrorHandler
 
-object ValidationMode extends Enum {
-  sealed abstract class Type protected (val mode: Int, val validator: String = "default") extends EnumValueType with Ordered[Type] with Serializable {
-    def compare(that: ValidationMode.Type) = this.mode - that.mode
+import scala.util.matching.Regex
+
+trait Validator {
+  def name(): String = getClass.getTypeName.toLowerCase
+
+  def checkArgs(args: Validator.Arguments): Either[String, Unit] = Right(())
+
+  def validateXML(document: java.io.InputStream, errHandler: ErrorHandler, args: Validator.Arguments): Unit
+}
+
+object Validator {
+  type Arguments = Seq[Validator.Argument]
+
+  case class Argument(key: String, value: String)
+  object Argument {
+    val DefaultKey = "default"
+    def apply(value: String): Argument = Argument(DefaultKey, value)
   }
-  case object Off extends Type(10)
-  case object Limited extends Type(20)
-  case object Full extends Type(30)
-  case class Custom(name: String, args: Seq[Argument]) extends Type( 100, name)
+
+  val NoArgsPattern: Regex = "(.+?)".r.anchored
+  val MultiArgsPattern: Regex = "(.+?)=(.+?=.+[,]?)+".r.anchored
+  val DefaultArgPattern: Regex = "(.+?)=(.+)".r.anchored
 }

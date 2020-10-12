@@ -71,6 +71,8 @@ private[sapi] object ValidationConversions {
       case ValidationMode.Off => SValidationMode.Off
       case ValidationMode.Limited => SValidationMode.Limited
       case ValidationMode.Full => SValidationMode.Full
+      // todo;; hacking this out for now
+      case _ => SValidationMode.Off
     }
     smode
   }
@@ -80,6 +82,8 @@ private[sapi] object ValidationConversions {
       case SValidationMode.Off => ValidationMode.Off
       case SValidationMode.Limited => ValidationMode.Limited
       case SValidationMode.Full => ValidationMode.Full
+      // todo;; hacking this out for now
+      case _ => ValidationMode.Off
     }
     mode
   }

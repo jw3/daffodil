@@ -73,6 +73,8 @@ private[japi] object ValidationConversions {
       case ValidationMode.Off => SValidationMode.Off
       case ValidationMode.Limited => SValidationMode.Limited
       case ValidationMode.Full => SValidationMode.Full
+      // todo;; support custom in java?
+      case _ => SValidationMode.Off
     }
     smode
   }
@@ -82,6 +84,8 @@ private[japi] object ValidationConversions {
       case SValidationMode.Off => ValidationMode.Off
       case SValidationMode.Limited => ValidationMode.Limited
       case SValidationMode.Full => ValidationMode.Full
+      // todo;; support custom in java?
+      case _ => ValidationMode.Off
     }
     mode
   }

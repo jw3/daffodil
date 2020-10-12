@@ -37,12 +37,14 @@ import org.apache.daffodil.Implicits._; object INoWarn4 {
 import org.apache.daffodil.api.DFDL
 import org.apache.daffodil.api.DaffodilTunables
 import org.apache.daffodil.api.ValidationMode
+import org.apache.daffodil.api.Validator
 import org.apache.daffodil.api.WithDiagnostics
 import org.apache.daffodil.debugger.Debugger
 import org.apache.daffodil.dsom.TunableLimitExceededError
 import org.apache.daffodil.dsom._
 import org.apache.daffodil.equality._; object EqualityNoWarn3 {
   EqualitySuppressUnusedImportWarning() }
+import org.apache.daffodil.util.Validators
 import org.apache.daffodil.events.MultipleEventHandler
 import org.apache.daffodil.exceptions.Assert
 import org.apache.daffodil.exceptions.SchemaFileLocation
@@ -72,7 +74,6 @@ import org.apache.daffodil.util.Logging
 import org.apache.daffodil.util.Maybe
 import org.apache.daffodil.util.Maybe._
 import org.apache.daffodil.util.Misc
-import org.apache.daffodil.util.Validator
 import org.apache.daffodil.xml.XMLUtils
 import org.xml.sax.ContentHandler
 import org.xml.sax.DTDHandler
@@ -419,14 +420,16 @@ class DataProcessor private (
     // events are created rather than writing the entire infoset in memory and
     // then validating at the end of the parse. See DAFFODIL-2386
     //
-    val (outputter, maybeValidationBytes) =
-    if (validationMode == ValidationMode.Full) {
-      val bos = new java.io.ByteArrayOutputStream()
-      val xmlOutputter = new XMLTextInfosetOutputter(bos, false)
-      val teeOutputter = new TeeInfosetOutputter(output, xmlOutputter)
-      (teeOutputter, One(bos))
-    } else {
-      (output, Nope)
+    val (outputter, maybeValidationBytes) = {
+      validationMode match {
+        case ValidationMode.Full | ValidationMode.Custom(_, _) =>
+          val bos = new java.io.ByteArrayOutputStream()
+          val xmlOutputter = new XMLTextInfosetOutputter(bos, false)
+          val teeOutputter = new TeeInfosetOutputter(output, xmlOutputter)
+          (teeOutputter, One(bos))
+        case _ =>
+          (output, Nope)
+      }
     }
 
     val rootERD = ssrd.elementRuntimeData
@@ -692,7 +695,8 @@ class DataProcessor private (
 class ParseResult(dp: DataProcessor, override val resultState: PState)
   extends DFDL.ParseResult
   with WithDiagnosticsImpl
-  with ErrorHandler {
+  with ErrorHandler
+  with Logging {
 
   /**
    * To be successful here, we need to capture xerces parse/validation
@@ -702,10 +706,22 @@ class ParseResult(dp: DataProcessor, override val resultState: PState)
    */
   def validateResult(bytes: Array[Byte]): Unit = {
     Assert.usage(resultState.processorStatus eq Success)
-    val schemaURIStrings = resultState.infoset.asInstanceOf[InfosetElement].runtimeData.schemaURIStringsForFullValidation
+
+    val (v, args) = dp.validationMode match {
+      case ValidationMode.Custom(name, args) =>
+        Validators.find(name).getOrElse(
+          Assert.abort(s"Validator '$name' not found")
+        ) -> args
+      case _ => Validators.default -> Seq(Validator.Argument(
+        resultState.infoset.asInstanceOf[InfosetElement].runtimeData.schemaURIStringsForFullValidation.mkString(",")
+      ))
+    }
+
+    Assert.usage(resultState.processorStatus eq Success)
+
     try {
       val bis = new java.io.ByteArrayInputStream(bytes)
-      Validator.validateXMLSources(schemaURIStrings, bis, this)
+      v.validateXML(bis, this, args)
     } catch {
       //
       // Some SAX Parse errors are thrown even if you specify an error handler to the
