@@ -36,7 +36,6 @@ import scala.concurrent.duration.Duration
 import scala.language.reflectiveCalls
 import scala.xml.Node
 import scala.xml.SAXParseException
-
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
@@ -102,6 +101,8 @@ import org.rogach.scallop.ArgType
 import org.rogach.scallop.ScallopOption
 import org.rogach.scallop.ValueConverter
 import org.apache.daffodil.util.Validators
+
+import scala.util.matching.Regex
 
 class NullOutputStream extends OutputStream {
   override def close(): Unit = {
@@ -232,14 +233,15 @@ class CLIConf(arguments: Array[String]) extends scallop.ScallopConf(arguments)
   }
 
   implicit def validateConverter = singleArgConverter[ValidationMode.Type]((s: String) => {
+    import ValidatorPatterns._
     s.toLowerCase match {
       case "on" => ValidationMode.Full
       case "limited" => ValidationMode.Limited
       case "off" => ValidationMode.Off
-      case Validator.MultiArgsPattern(str, args) if Validators.exists(str) =>
+      case MultiArgsPattern(str, args) if Validators.exists(str) =>
         ValidationMode.Custom(str, args.split(",").map(_.split("=")).map(kv => Validator.Argument(kv.head, kv.last)))
-      case Validator.DefaultArgPattern(str, arg) if Validators.exists(str) => ValidationMode.Custom(str, Seq(Validator.Argument(arg)))
-      case Validator.NoArgsPattern(str) if Validators.exists(str) => ValidationMode.Custom(str, Seq.empty)
+      case DefaultArgPattern(str, arg) if Validators.exists(str) => ValidationMode.Custom(str, Seq(Validator.Argument(arg)))
+      case NoArgsPattern(str) if Validators.exists(str) => ValidationMode.Custom(str, Seq.empty)
       case _ => throw new Exception("Unrecognized ValidationMode %s.  Must be 'on', 'limited', 'off', or name of spi validator.".format(s))
     }
   })
@@ -571,6 +573,12 @@ class CLIConf(arguments: Array[String]) extends scallop.ScallopConf(arguments)
   }
 
   verify()
+}
+
+object ValidatorPatterns {
+  val NoArgsPattern: Regex = "(.+?)".r.anchored
+  val MultiArgsPattern: Regex = "(.+?)=(.+?=.+[,]?)+".r.anchored
+  val DefaultArgPattern: Regex = "(.+?)=(.+)".r.anchored
 }
 
 object Main extends Logging {

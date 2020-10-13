@@ -15,24 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.daffodil.api
+package org.apache.daffodil
 
 import org.junit.Test
-import org.apache.daffodil.exceptions.Assert.invariantFailed
 import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 
 class TestValidatorPatterns {
   @Test def testNoArgsPattern(): Unit = {
     val vname = "vvv"
     s"$vname" match {
-      case Validator.MultiArgsPattern(_, _) =>
-        invariantFailed("should not have matched")
-      case Validator.DefaultArgPattern(_, _) =>
-        invariantFailed("should not have matched")
-      case Validator.NoArgsPattern(v) =>
+      case ValidatorPatterns.MultiArgsPattern(_, _) =>
+        fail("should not have matched")
+      case ValidatorPatterns.DefaultArgPattern(_, _) =>
+        fail("should not have matched")
+      case ValidatorPatterns.NoArgsPattern(v) =>
         assertEquals(vname, v)
       case _ =>
-        invariantFailed("did not match")
+        fail("did not match")
     }
   }
 
@@ -40,19 +40,19 @@ class TestValidatorPatterns {
     val vname = "vvv"
     val vargs = "foo=bar"
     s"$vname=$vargs" match {
-      case Validator.MultiArgsPattern(v, args) =>
+      case ValidatorPatterns.MultiArgsPattern(v, args) =>
         assertEquals(vname, v)
         assertEquals(vargs, args)
       case _ =>
-        invariantFailed("did not match")
+        fail("did not match")
     }
   }
 
   @Test def testMultiArgsPattern_IsNotDefault(): Unit = {
     val arg = s"vvv=some_default_argument_string"
     arg match {
-      case Validator.MultiArgsPattern(_, args) =>
-        invariantFailed(s"should not have matched on $arg")
+      case ValidatorPatterns.MultiArgsPattern(_, args) =>
+        fail(s"should not have matched on $arg")
       case _ =>
     }
   }
@@ -61,35 +61,35 @@ class TestValidatorPatterns {
     val vname = "vvv"
     val vargs = "foo=bar,baz=fiz"
     s"$vname=$vargs" match {
-      case Validator.MultiArgsPattern(v, args) =>
+      case ValidatorPatterns.MultiArgsPattern(v, args) =>
         assertEquals(vname, v)
         assertEquals(vargs, args)
       case _ =>
-        invariantFailed("did not match")
+        fail("did not match")
     }
 
     val vargs2 = s"${vargs},foo2=bar2,baz2=fiz2"
     s"$vname=$vargs2" match {
-      case Validator.MultiArgsPattern(v, args) =>
+      case ValidatorPatterns.MultiArgsPattern(v, args) =>
         assertEquals(vname, v)
         assertEquals(vargs2, args)
       case _ =>
-        invariantFailed("did not match")
+        fail("did not match")
     }
   }
   @Test def testDefaultArgsPattern(): Unit = {
     val vname = "vvv"
     val varg = "some_default_argument_string"
     s"$vname=$varg" match {
-      case Validator.MultiArgsPattern(_, _) =>
-        invariantFailed("should not have matched")
-      case Validator.DefaultArgPattern(v, arg) =>
+      case ValidatorPatterns.MultiArgsPattern(_, _) =>
+        fail("should not have matched")
+      case ValidatorPatterns.DefaultArgPattern(v, arg) =>
         assertEquals(vname, v)
         assertEquals(varg, arg)
-      case Validator.NoArgsPattern(_) =>
-        invariantFailed("should not have matched")
+      case ValidatorPatterns.NoArgsPattern(_) =>
+        fail("should not have matched")
       case _ =>
-        invariantFailed("did not match")
+        fail("did not match")
     }
   }
 }

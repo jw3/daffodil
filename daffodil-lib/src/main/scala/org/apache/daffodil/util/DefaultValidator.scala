@@ -19,13 +19,11 @@ package org.apache.daffodil.util
 
 import java.net.URI
 
-import org.apache.daffodil.api.Validator
-
 import scala.collection.mutable
 import scala.xml.parsing.NoBindingFactoryAdapter
-
 import javax.xml.XMLConstants
 import javax.xml.transform.stream.StreamSource
+import org.apache.daffodil.api.Validator
 import org.apache.daffodil.xml.DFDLCatalogResolver
 import org.xml.sax.ErrorHandler
 

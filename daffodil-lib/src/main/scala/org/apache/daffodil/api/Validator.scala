@@ -19,8 +19,6 @@ package org.apache.daffodil.api
 
 import org.xml.sax.ErrorHandler
 
-import scala.util.matching.Regex
-
 trait Validator {
   def name(): String = getClass.getTypeName.toLowerCase
 
@@ -37,8 +35,4 @@ object Validator {
     val DefaultKey = "default"
     def apply(value: String): Argument = Argument(DefaultKey, value)
   }
-
-  val NoArgsPattern: Regex = "(.+?)".r.anchored
-  val MultiArgsPattern: Regex = "(.+?)=(.+?=.+[,]?)+".r.anchored
-  val DefaultArgPattern: Regex = "(.+?)=(.+)".r.anchored
 }
