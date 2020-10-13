@@ -36,3 +36,5 @@ object Validator {
     def apply(value: String): Argument = Argument(DefaultKey, value)
   }
 }
+
+case class ValidatorNotFoundException(name: String) extends Exception(s"$name validator was not found")

@@ -31,8 +31,9 @@ import java.util.zip.GZIPOutputStream
 
 import scala.collection.immutable.Queue
 import scala.collection.mutable
-
-import org.apache.daffodil.Implicits._; object INoWarn4 {
+import org.apache.daffodil.api
+import org.apache.daffodil.Implicits._
+import org.apache.daffodil.api.ValidatorNotFoundException; object INoWarn4 {
   ImplicitsSuppressUnusedImportWarning() }
 import org.apache.daffodil.api.DFDL
 import org.apache.daffodil.api.DaffodilTunables
@@ -242,7 +243,12 @@ class DataProcessor private (
   @deprecated("Use withValidationMode.", "2.6.0")
   def setValidationMode(mode: ValidationMode.Type): Unit = { validationMode = mode }
 
-  def withValidationMode(mode:ValidationMode.Type): DataProcessor = copy(validationMode = mode)
+  def withValidationMode(mode:ValidationMode.Type): DataProcessor = mode match {
+      case ValidationMode.Custom(v, _) if !Validators.exists(v) =>
+        throw api.ValidatorNotFoundException(v)
+      case _ =>
+        copy(validationMode = mode)
+    }
 
   // TODO Deprecate and replace usages with just tunables.
   def getTunables: DaffodilTunables = tunables
@@ -708,10 +714,8 @@ class ParseResult(dp: DataProcessor, override val resultState: PState)
     Assert.usage(resultState.processorStatus eq Success)
 
     val (v, args) = dp.validationMode match {
-      case ValidationMode.Custom(name, args) =>
-        Validators.find(name).getOrElse(
-          Assert.abort(s"Validator '$name' not found")
-        ) -> args
+      case ValidationMode.Custom(name, _) if !Validators.exists(name) => throw ValidatorNotFoundException(name)
+      case ValidationMode.Custom(name, args) => Validators.find(name).get -> args
       case _ => Validators.default -> Seq(Validator.Argument(
         resultState.infoset.asInstanceOf[InfosetElement].runtimeData.schemaURIStringsForFullValidation.mkString(",")
       ))
