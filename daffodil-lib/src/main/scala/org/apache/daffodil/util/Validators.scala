@@ -24,8 +24,11 @@ import org.apache.daffodil.api.Validator
 object Validators {
   import scala.collection.JavaConverters._
 
+  // validator instances cached as thread local to support validation simultaneously occuring on multiple threads
+  // validator implementors can provide stateless inexpensive validators that are spawned for each thread or proxy
+  // to a singleton object that is thread safe. both use cases are sane and will work for client libraries
   private val impls = new ThreadLocal[Map[String, Validator]] {
-    override def initialValue = {
+    override def initialValue: Map[String, Validator] = {
         ServiceLoader
           .load(classOf[Validator])
           .iterator()
