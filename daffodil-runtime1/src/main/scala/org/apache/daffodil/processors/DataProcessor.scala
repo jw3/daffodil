@@ -717,8 +717,6 @@ class ParseResult(dp: DataProcessor, override val resultState: PState)
       ))
     }
 
-    Assert.usage(resultState.processorStatus eq Success)
-
     try {
       val bis = new java.io.ByteArrayInputStream(bytes)
       v.validateXML(bis, this, args)
