@@ -37,7 +37,7 @@ object Validators {
 
   def all(): Map[String, Validator] = impls.get()
   def find(name: String): Option[Validator] = all().get(name)
-  def exists(name: String): Boolean = all().exists(name == _._1)
+  def exists(name: String): Boolean = find(name).isDefined
   val default: Validator = new DefaultValidatorSPIProvider
   def checkArgs(name: String, args: Validator.Arguments): Either[String, Unit] =
     find(name) match {
