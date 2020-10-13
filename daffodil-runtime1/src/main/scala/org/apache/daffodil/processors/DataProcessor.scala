@@ -699,10 +699,10 @@ class ParseResult(dp: DataProcessor, override val resultState: PState)
   with Logging {
 
   /**
-   * To be successful here, we need to capture xerces parse/validation
+   * To be successful here, we need to capture parse/validation
    * errors and add them to the Diagnostics list in the PState.
    *
-   * @param state the initial parse state.
+   * @param bytes the parsed Infoset
    */
   def validateResult(bytes: Array[Byte]): Unit = {
     Assert.usage(resultState.processorStatus eq Success)
