@@ -234,16 +234,17 @@ class CLIConf(arguments: Array[String]) extends scallop.ScallopConf(arguments)
 
   implicit def validateConverter = singleArgConverter[ValidationMode.Type]((s: String) => {
     import ValidatorPatterns._
+    val compiler = Validators.compiler()
     s.toLowerCase match {
       case "on" => ValidationMode.Full
       case "limited" => ValidationMode.Limited
       case "off" => ValidationMode.Off
-      case MultiArgsPattern(name, args) if Validators.isRegistered(name) =>
-        ValidationMode.Custom(Validators.compile(name, args.split(",").map(_.split("=")).map(kv => Validator.Argument(kv.head, kv.last))))
-      case DefaultArgPattern(name, arg) if Validators.isRegistered(name) =>
-        ValidationMode.Custom(Validators.compile(name, Seq(Validator.Argument(arg))))
-      case NoArgsPattern(name) if Validators.isRegistered(name) =>
-        ValidationMode.Custom(Validators.compile(name, Seq.empty))
+      case MultiArgsPattern(name, args) if compiler.isRegistered(name) =>
+        ValidationMode.Custom(compiler.compile(name, args.split(",").map(_.split("=")).map(kv => Validator.Argument(kv.head, kv.last))))
+      case DefaultArgPattern(name, arg) if compiler.isRegistered(name) =>
+        ValidationMode.Custom(compiler.compile(name, Seq(Validator.Argument(arg))))
+      case NoArgsPattern(name) if compiler.isRegistered(name) =>
+        ValidationMode.Custom(compiler.compile(name, Seq.empty))
       case _ => throw new Exception("Unrecognized ValidationMode %s.  Must be 'on', 'limited', 'off', or name of spi validator.".format(s))
     }
   })
