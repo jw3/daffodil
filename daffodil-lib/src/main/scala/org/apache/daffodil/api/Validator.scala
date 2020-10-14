@@ -21,9 +21,6 @@ import org.xml.sax.ErrorHandler
 
 trait Validator {
   def name(): String = getClass.getTypeName.toLowerCase
-
-  def checkArgs(args: Validator.Arguments): Either[String, Unit] = Right(())
-
   def validateXML(document: java.io.InputStream, errHandler: ErrorHandler, args: Validator.Arguments): Unit
 }
 
@@ -35,6 +32,18 @@ object Validator {
     val DefaultKey = "default"
     def apply(value: String): Argument = Argument(DefaultKey, value)
   }
+
+  object CompilerOps {
+    trait CheckArgs {
+      def checkArgs(args: Validator.Arguments): Validator.Arguments
+    }
+  }
 }
 
 case class ValidatorNotFoundException(name: String) extends Exception(s"$name validator was not found")
+case class ValidatorCompilationException(message: String) extends Exception(message)
+
+abstract class CompiledValidator(val v: Validator) {
+  final def name: String = v.name()
+  def validateXML(document: java.io.InputStream, errHandler: ErrorHandler): Unit
+}

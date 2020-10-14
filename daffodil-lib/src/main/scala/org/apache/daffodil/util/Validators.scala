@@ -17,9 +17,14 @@
 
 package org.apache.daffodil.util
 
+import java.io.InputStream
 import java.util.ServiceLoader
 
+import org.apache.daffodil.api.CompiledValidator
 import org.apache.daffodil.api.Validator
+import org.apache.daffodil.api.Validator.CompilerOps.CheckArgs
+import org.apache.daffodil.api.ValidatorNotFoundException
+import org.xml.sax.ErrorHandler
 
 object Validators {
   import scala.collection.JavaConverters._
@@ -38,13 +43,36 @@ object Validators {
     }
   }
 
-  def all(): Map[String, Validator] = impls.get()
-  def find(name: String): Option[Validator] = all().get(name)
-  def exists(name: String): Boolean = find(name).isDefined
+  private val compiled = new ThreadLocal[Map[String, CompiledValidator]]
+
+  private def all(): Map[String, Validator] = impls.get()
+  private def impl(name: String): Option[Validator] = all().get(name)
+  def isRegistered(name: String): Boolean = find(name).isDefined
   val default: Validator = new DefaultValidatorSPIProvider
-  def checkArgs(name: String, args: Validator.Arguments): Either[String, Unit] =
+
+  def find(name: String): Option[CompiledValidator] = compiled.get.get(name)
+  def compile(name: String, args: Validator.Arguments): CompiledValidator = {
     find(name) match {
-      case None => Left(s"Validator '$name' was not found.")
-      case Some(v) => v.checkArgs(args)
+      case Some(cv) => cv
+      case None =>
+        val vv = impl(name).getOrElse(throw ValidatorNotFoundException(name))
+        val aa = vv match {
+          case ac: CheckArgs => ac.checkArgs(args)
+          case _ => args
+        }
+        val cv = new CompiledValidator(vv) {
+          def validateXML(document: InputStream, errHandler: ErrorHandler): Unit = {
+            v.validateXML(document, errHandler, aa)
+          }
+        }
+        addcv(name, cv)
+        cv
     }
+  }
+
+  private def addcv(name: String, cv: CompiledValidator) = {
+    compiled.set(
+      compiled.get() + (name -> cv)
+    )
+  }
 }

@@ -238,10 +238,12 @@ class CLIConf(arguments: Array[String]) extends scallop.ScallopConf(arguments)
       case "on" => ValidationMode.Full
       case "limited" => ValidationMode.Limited
       case "off" => ValidationMode.Off
-      case MultiArgsPattern(str, args) if Validators.exists(str) =>
-        ValidationMode.Custom(str, args.split(",").map(_.split("=")).map(kv => Validator.Argument(kv.head, kv.last)))
-      case DefaultArgPattern(str, arg) if Validators.exists(str) => ValidationMode.Custom(str, Seq(Validator.Argument(arg)))
-      case NoArgsPattern(str) if Validators.exists(str) => ValidationMode.Custom(str, Seq.empty)
+      case MultiArgsPattern(name, args) if Validators.isRegistered(name) =>
+        ValidationMode.Custom(Validators.compile(name, args.split(",").map(_.split("=")).map(kv => Validator.Argument(kv.head, kv.last))))
+      case DefaultArgPattern(name, arg) if Validators.isRegistered(name) =>
+        ValidationMode.Custom(Validators.compile(name, Seq(Validator.Argument(arg))))
+      case NoArgsPattern(name) if Validators.isRegistered(name) =>
+        ValidationMode.Custom(Validators.compile(name, Seq.empty))
       case _ => throw new Exception("Unrecognized ValidationMode %s.  Must be 'on', 'limited', 'off', or name of spi validator.".format(s))
     }
   })
@@ -372,7 +374,6 @@ class CLIConf(arguments: Array[String]) extends scallop.ScallopConf(arguments)
     }
 
     validateOpt(validate) {
-      case (Some(ValidationMode.Custom(name, args))) => Validators.checkArgs(name, args).left.map(m => s"$name validator: $m")
       case _ => Right(Unit)
     }
 

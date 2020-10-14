@@ -31,9 +31,9 @@ import java.util.zip.GZIPOutputStream
 
 import scala.collection.immutable.Queue
 import scala.collection.mutable
-import org.apache.daffodil.api
 import org.apache.daffodil.Implicits._
-import org.apache.daffodil.api.ValidatorNotFoundException; object INoWarn4 {
+import org.apache.daffodil.api.CompiledValidator
+; object INoWarn4 {
   ImplicitsSuppressUnusedImportWarning() }
 import org.apache.daffodil.api.DFDL
 import org.apache.daffodil.api.DaffodilTunables
@@ -243,12 +243,7 @@ class DataProcessor private (
   @deprecated("Use withValidationMode.", "2.6.0")
   def setValidationMode(mode: ValidationMode.Type): Unit = { validationMode = mode }
 
-  def withValidationMode(mode:ValidationMode.Type): DataProcessor = mode match {
-      case ValidationMode.Custom(v, _) if !Validators.exists(v) =>
-        throw api.ValidatorNotFoundException(v)
-      case _ =>
-        copy(validationMode = mode)
-    }
+  def withValidationMode(mode:ValidationMode.Type): DataProcessor = copy(validationMode = mode)
 
   // TODO Deprecate and replace usages with just tunables.
   def getTunables: DaffodilTunables = tunables
@@ -428,7 +423,7 @@ class DataProcessor private (
     //
     val (outputter, maybeValidationBytes) = {
       validationMode match {
-        case ValidationMode.Full | ValidationMode.Custom(_, _) =>
+        case ValidationMode.Full | ValidationMode.Custom(_) =>
           val bos = new java.io.ByteArrayOutputStream()
           val xmlOutputter = new XMLTextInfosetOutputter(bos, false)
           val teeOutputter = new TeeInfosetOutputter(output, xmlOutputter)
@@ -713,17 +708,23 @@ class ParseResult(dp: DataProcessor, override val resultState: PState)
   def validateResult(bytes: Array[Byte]): Unit = {
     Assert.usage(resultState.processorStatus eq Success)
 
-    val (v, args) = dp.validationMode match {
-      case ValidationMode.Custom(name, _) if !Validators.exists(name) => throw ValidatorNotFoundException(name)
-      case ValidationMode.Custom(name, args) => Validators.find(name).get -> args
-      case _ => Validators.default -> Seq(Validator.Argument(
-        resultState.infoset.asInstanceOf[InfosetElement].runtimeData.schemaURIStringsForFullValidation.mkString(",")
-      ))
+    val v = dp.validationMode match {
+      case ValidationMode.Custom(cv) => cv
+      case _ =>
+        // todo;; this case is odd because we need this state for the default case
+        val args = Seq(Validator.Argument(
+          resultState.infoset.asInstanceOf[InfosetElement].runtimeData.schemaURIStringsForFullValidation.mkString(",")
+        ))
+        new CompiledValidator(Validators.default) {
+          def validateXML(document: InputStream, errHandler: ErrorHandler): Unit = {
+            v.validateXML(document, errHandler, args)
+          }
+        }
     }
 
     try {
       val bis = new java.io.ByteArrayInputStream(bytes)
-      v.validateXML(bis, this, args)
+      v.validateXML(bis, this)
     } catch {
       //
       // Some SAX Parse errors are thrown even if you specify an error handler to the
