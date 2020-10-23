@@ -50,7 +50,6 @@ import org.apache.daffodil.exceptions.UnsuppressableException
 import org.apache.daffodil.externalvars.Binding
 import org.apache.daffodil.externalvars.ExternalVariablesLoader
 import org.apache.daffodil.infoset.DIElement
-import org.apache.daffodil.infoset.InfosetElement
 import org.apache.daffodil.infoset.InfosetException
 import org.apache.daffodil.infoset.InfosetInputter
 import org.apache.daffodil.infoset.InfosetOutputter
@@ -695,7 +694,7 @@ class ParseResult(dp: DataProcessor, override val resultState: PState)
    */
   def validateResult(bytes: Array[Byte]): Unit = {
     Assert.usage(resultState.processorStatus eq Success)
-    val schemaURIStrings = resultState.infoset.asInstanceOf[InfosetElement].runtimeData.schemaURIStringsForFullValidation
+    val schemaURIStrings = resultState.infoset.runtimeData.schemaURIStringsForFullValidation
     try {
       val bis = new java.io.ByteArrayInputStream(bytes)
       Validator.validateXMLSources(schemaURIStrings, bis, this)
