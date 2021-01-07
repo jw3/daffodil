@@ -146,8 +146,10 @@ lazy val commonSettings = Seq(
   sourceManaged := baseDirectory.value / "src_managed",
   resourceManaged := baseDirectory.value / "resource_managed",
   libraryDependencies ++= Dependencies.common,
+  libraryDependencies += "org.apache.daffodil" %% "sbt-tdml-interface" % "0.2-SNAPSHOT" % Test,
   parallelExecution in IntegrationTest := false,
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v"),
+  testFrameworks += new TestFramework("org.apache.daffodil.tdml.TdmlFramework")
 ) ++ Defaults.itSettings
 
 def scalacCrossOptions(scalaVersion: String) =
