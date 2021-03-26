@@ -17,6 +17,7 @@
 
 package org.apache.daffodil.validation
 
+import org.apache.commons.io.output.NullOutputStream.NULL_OUTPUT_STREAM
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
@@ -51,7 +52,7 @@ class TestValidatorsSPI {
   @Test def testPassingValidator(): Unit = {
     val f = Validators.get(PassingValidator.name)
     val v = f.make(XercesValidatorFactory.makeConfig(Seq(schema)))
-    val r = v.validateXML(infoset)
+    val r = v.validateXML(infoset, NULL_OUTPUT_STREAM)
 
     assertTrue(r.warnings.isEmpty)
     assertTrue(r.errors.isEmpty)
@@ -60,7 +61,7 @@ class TestValidatorsSPI {
   @Test def testFailingValidator(): Unit = {
     val f = Validators.get(FailingValidator.name)
     val v = f.make(XercesValidatorFactory.makeConfig(Seq(schema)))
-    val r = v.validateXML(infoset)
+    val r = v.validateXML(infoset, NULL_OUTPUT_STREAM)
 
     assertTrue(r.warnings.isEmpty)
     assertFalse(r.errors.isEmpty)

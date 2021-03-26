@@ -19,6 +19,7 @@ package org.apache.daffodil.validation.schematron
 
 import java.io.ByteArrayInputStream
 import net.sf.saxon.TransformerFactoryImpl
+import org.apache.commons.io.output.NullOutputStream
 import org.apache.daffodil.validation.schematron.SchSource.Sch
 import org.junit.Assert.assertNotNull
 import org.junit.Test
@@ -39,7 +40,7 @@ class TestBasicValidation {
     val xml = Source.fromResource("xml/article-1.xml").mkString
     val p = SchematronValidatorFactory.makeValidator(new ByteArrayInputStream(sch.getBytes), Sch)
 
-    val result = p.validateXML(new ByteArrayInputStream(xml.getBytes))
+    val result = p.validateXML(new ByteArrayInputStream(xml.getBytes), NullOutputStream.NULL_OUTPUT_STREAM)
     assert(result.errors.isEmpty)
   }
 
@@ -48,7 +49,7 @@ class TestBasicValidation {
     val xml = Source.fromResource("xml/article-2.xml").mkString
     val p = SchematronValidatorFactory.makeValidator(new ByteArrayInputStream(sch.getBytes), Sch)
 
-    val result = p.validateXML(new ByteArrayInputStream(xml.getBytes))
+    val result = p.validateXML(new ByteArrayInputStream(xml.getBytes), NullOutputStream.NULL_OUTPUT_STREAM)
     result.errors.forEach(e => println(s"Fail: ${e.getMessage}"))
     assert(result.errors.size() == 2)
   }
@@ -58,7 +59,7 @@ class TestBasicValidation {
     val xml = Source.fromResource("xml/article-3.xml").mkString
     val p = SchematronValidatorFactory.makeValidator(new ByteArrayInputStream(sch.getBytes), Sch, Some(new CustomResolver))
 
-    val result = p.validateXML(new ByteArrayInputStream(xml.getBytes))
+    val result = p.validateXML(new ByteArrayInputStream(xml.getBytes), NullOutputStream.NULL_OUTPUT_STREAM)
     result.errors.forEach(e => println(s"Fail: ${e.getMessage}"))
     assert(result.errors.size() == 1)
   }

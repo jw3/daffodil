@@ -19,6 +19,8 @@ package org.apache.daffodil.validation
 
 import org.junit.Test
 import org.junit.Assert.assertTrue
+import org.apache.commons.io.output.NullOutputStream.NULL_OUTPUT_STREAM
+
 
 class TestXercesValidator {
   val schema = getClass.getResource("/test/validation/testSchema1.dfdl.xsd").toURI.toString
@@ -27,7 +29,7 @@ class TestXercesValidator {
   @Test def testFromSPI(): Unit = {
     val f = Validators.get(XercesValidator.name)
     val v = f.make(XercesValidatorFactory.makeConfig(Seq(schema)))
-    val r = v.validateXML(infoset)
+    val r = v.validateXML(infoset, NULL_OUTPUT_STREAM)
 
     assertTrue(r.warnings.isEmpty)
     assertTrue(r.errors.isEmpty)

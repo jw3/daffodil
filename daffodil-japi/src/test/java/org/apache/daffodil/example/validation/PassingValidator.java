@@ -21,13 +21,14 @@ import org.apache.daffodil.api.ValidationResult;
 import org.apache.daffodil.api.Validator;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collections;
 
 public class PassingValidator implements Validator {
     public static final String name = "passing-japi-validator";
 
     @Override
-    public ValidationResult validateXML(InputStream document) {
+    public ValidationResult validateXML(InputStream document, OutputStream output) {
         return new ValidationResult(Collections.emptyList(), Collections.emptyList());
     }
 }

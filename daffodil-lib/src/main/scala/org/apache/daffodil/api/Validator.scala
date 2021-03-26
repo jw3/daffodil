@@ -27,7 +27,7 @@ import com.typesafe.config.Config
  * @see [[org.apache.daffodil.validation.XercesValidator]] for example of using ThreadLocal for thread safety
  */
 trait Validator {
-  def validateXML(document: java.io.InputStream): ValidationResult
+  def validateXML(document: java.io.InputStream, output: java.io.OutputStream): ValidationResult
 }
 
 /**

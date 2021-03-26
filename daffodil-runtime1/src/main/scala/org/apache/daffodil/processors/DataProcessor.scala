@@ -17,6 +17,8 @@
 
 package org.apache.daffodil.processors
 
+import org.apache.commons.io.output.NullOutputStream
+
 import java.io.File
 import java.io.IOException
 import java.io.ObjectOutputStream
@@ -25,9 +27,7 @@ import java.nio.LongBuffer
 import java.nio.channels.Channels
 import java.nio.file.Files
 import java.util.zip.GZIPOutputStream
-
 import scala.collection.immutable.Queue
-
 import org.apache.daffodil.Implicits._; object INoWarn4 {
   ImplicitsSuppressUnusedImportWarning() }
 import org.apache.daffodil.api.ValidationException
@@ -695,7 +695,8 @@ class ParseResult(dp: DataProcessor, override val resultState: PState)
     Assert.usage(resultState.processorStatus eq Success)
 
     val bis = new java.io.ByteArrayInputStream(bytes)
-    dp.validator.validateXML(bis) match {
+    val output = NullOutputStream.NULL_OUTPUT_STREAM
+    dp.validator.validateXML(bis, output) match {
       case ValidationResult(warnings, errors) =>
         warnings.forEach{ w => resultState.validationError(w.getMessage) }
         errors.forEach{

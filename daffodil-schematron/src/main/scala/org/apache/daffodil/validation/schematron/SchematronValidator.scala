@@ -18,19 +18,21 @@
 package org.apache.daffodil.validation.schematron
 
 import java.io.InputStream
-
 import org.apache.daffodil.api.ValidationFailure
 import org.apache.daffodil.api.ValidationResult
 import org.apache.daffodil.api.Validator
 
+import java.io.OutputStream
 import scala.xml.XML
 
 /**
  * Daffodil Validator implementation for ISO schematron
  */
 final class SchematronValidator(engine: Schematron) extends Validator {
-  def validateXML(document: InputStream): ValidationResult = {
+  def validateXML(document: InputStream, output: OutputStream): ValidationResult = {
     val svrl = XML.loadString(engine.validate(document))
+    output.write(svrl.mkString.getBytes)
+
     val err = for(f @ <svrl:failed-assert>{ msg @ _* }</svrl:failed-assert> <- svrl.child) yield {
       SchematronValidationError(msg.text.trim, { f \\ "@location" }.text)
     }

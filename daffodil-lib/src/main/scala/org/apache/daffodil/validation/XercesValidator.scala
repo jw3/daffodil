@@ -92,7 +92,7 @@ class XercesValidator(schemaFileNames: Seq[String])
       initializeValidator(schema.newValidator(), resolver)
   }
 
-  def validateXML(document: java.io.InputStream): ValidationResult = {
+  def validateXML(document: java.io.InputStream, output: java.io.OutputStream): ValidationResult = {
     val documentSource = new StreamSource(document)
 
     // get the validator instance for this thread

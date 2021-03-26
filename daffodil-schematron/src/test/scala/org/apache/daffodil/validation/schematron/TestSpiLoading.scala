@@ -18,8 +18,8 @@
 package org.apache.daffodil.validation.schematron
 
 import java.io.ByteArrayInputStream
-
 import com.typesafe.config.ConfigFactory
+import org.apache.commons.io.output.NullOutputStream
 import org.apache.daffodil.validation.Validators
 import org.junit.Test
 
@@ -33,7 +33,7 @@ class TestSpiLoading {
         |""".stripMargin))
     val xml = Source.fromResource("xml/article-2.xml").mkString
 
-    val result = v.validateXML(new ByteArrayInputStream(xml.getBytes))
+    val result = v.validateXML(new ByteArrayInputStream(xml.getBytes), NullOutputStream.NULL_OUTPUT_STREAM)
     result.errors.forEach(e => println(s"Fail: ${e.getMessage}"))
     assert(result.errors.size() == 2)
   }
